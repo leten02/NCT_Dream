@@ -1,0 +1,992 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>NCT Dreams</title>
+<style>
+*{margin:0;padding:0;box-sizing:border-box}
+:root{--black:#0a0a0a;--white:#f5f5f0;--gold:#c8a84b}
+body{background:var(--black);color:var(--white);font-family:'Inter','Apple SD Gothic Neo','Helvetica Neue',sans-serif;overflow-x:hidden;cursor:none}
+#cursor{position:fixed;width:10px;height:10px;background:var(--white);border-radius:50%;pointer-events:none;z-index:9999;transform:translate(-50%,-50%);mix-blend-mode:difference}
+nav{position:fixed;top:0;left:0;right:0;z-index:200;display:flex;justify-content:space-between;align-items:center;padding:24px 48px;background:linear-gradient(to bottom,rgba(0,0,0,.7) 0%,transparent 100%)}
+.nav-logo{font-size:15px;letter-spacing:4px;font-weight:300;opacity:.8}
+.nav-links{display:flex;gap:32px}
+.nav-links a{font-size:12px;letter-spacing:2px;text-decoration:none;color:rgba(255,255,255,.5);transition:color .3s;text-transform:uppercase}
+.nav-links a:hover{color:var(--white)}
+#progress-bar{position:fixed;top:0;left:0;height:2px;background:var(--gold);z-index:300;width:0%;transition:width .1s}
+
+/* S1 */
+#s1{height:100vh;display:flex;align-items:center;justify-content:center;position:relative;overflow:hidden}
+.hwy-bg{position:absolute;inset:0;background:radial-gradient(1px 1px at 10% 15%,rgba(255,255,255,.7) 0%,transparent 100%),radial-gradient(1.5px 1.5px at 30% 8%,rgba(255,255,255,.8) 0%,transparent 100%),radial-gradient(1px 1px at 55% 12%,rgba(255,255,255,.6) 0%,transparent 100%),radial-gradient(1.5px 1.5px at 75% 18%,rgba(255,255,255,.7) 0%,transparent 100%),radial-gradient(1px 1px at 90% 9%,rgba(255,255,255,.5) 0%,transparent 100%),radial-gradient(1px 1px at 18% 30%,rgba(255,255,255,.4) 0%,transparent 100%),radial-gradient(1px 1px at 42% 22%,rgba(255,255,255,.5) 0%,transparent 100%),linear-gradient(to bottom,#03050f 0%,#0a1520 35%,#111820 50%,#1a1008 75%,#0a0a0a 100%)}
+.road{position:absolute;bottom:0;left:0;right:0;height:50%}
+.road-surface{position:absolute;bottom:0;left:0;right:0;height:100%;background:linear-gradient(to bottom,#161616 0%,#222 60%,#282828 100%);clip-path:polygon(28% 0%,72% 0%,100% 100%,0% 100%)}
+.road-center{position:absolute;bottom:0;left:0;right:0;height:100%;background:repeating-linear-gradient(to top,#f5d060 0px,#f5d060 30px,transparent 30px,transparent 50px);clip-path:polygon(49% 0%,51% 0%,54% 100%,46% 100%);animation:roadScroll 1s linear infinite}
+.road-edge-l{position:absolute;bottom:0;left:28%;width:2px;height:100%;background:rgba(255,255,255,.2);transform-origin:bottom;transform:skewX(32deg)}
+.road-edge-r{position:absolute;bottom:0;right:28%;width:2px;height:100%;background:rgba(255,255,255,.2);transform-origin:bottom;transform:skewX(-32deg)}
+.city-glow{position:absolute;bottom:50%;left:0;right:0;height:100px;background:radial-gradient(ellipse 70% 80% at 50% 100%,rgba(255,120,30,.3) 0%,rgba(180,60,10,.08) 50%,transparent 100%)}
+.s1-content{position:relative;z-index:10;text-align:center;animation:fadeUp .8s ease both;margin-bottom:22vh}
+.s1-label{font-size:11px;letter-spacing:6px;text-transform:uppercase;color:var(--gold);margin-bottom:20px;opacity:.8}
+.s1-title{font-size:clamp(56px,10vw,110px);font-weight:700;letter-spacing:-2px;line-height:.95}
+.s1-title .nct{display:block;color:var(--white)}
+.s1-title .dream{display:block;color:rgba(255,255,255,.2);font-weight:300;letter-spacing:8px;font-size:.52em;margin-top:14px}
+.s1-members{margin-top:28px;font-size:13px;letter-spacing:3px;color:rgba(255,255,255,.35);text-transform:uppercase}
+.scroll-down{position:absolute;bottom:40px;left:50%;transform:translateX(-50%);display:flex;flex-direction:column;align-items:center;gap:8px;font-size:10px;letter-spacing:3px;color:rgba(255,255,255,.3);text-transform:uppercase}
+.scroll-line{width:1px;height:40px;background:linear-gradient(to bottom,rgba(255,255,255,.3),transparent);animation:scrollPulse 2s ease-in-out infinite}
+
+/* S2 */
+#s2{min-height:100vh;display:flex;align-items:center;justify-content:center;background:#0d0d0d;position:relative}
+.s2-inner{max-width:900px;width:90%;display:grid;grid-template-columns:1fr 1fr;gap:80px;align-items:center}
+.s2-eyebrow{font-size:11px;letter-spacing:5px;color:var(--gold);text-transform:uppercase;margin-bottom:24px}
+.s2-heading{font-size:clamp(36px,6vw,64px);font-weight:700;line-height:1.05;margin-bottom:28px}
+.s2-body{font-size:16px;color:rgba(255,255,255,.45);line-height:1.8}
+.s2-body strong{color:var(--white);font-weight:500}
+.nct-row{display:grid;grid-template-columns:60px 1fr;align-items:center;gap:20px;padding:24px 0;border-bottom:1px solid rgba(255,255,255,.07);opacity:0;transform:translateX(30px);transition:opacity .6s,transform .6s}
+.nct-row.show{opacity:1;transform:translateX(0)}
+.nct-letter{font-size:52px;font-weight:800;color:var(--white);line-height:1}
+.nct-name{font-size:18px;font-weight:500;margin-bottom:4px}
+.nct-desc{font-size:13px;color:rgba(255,255,255,.4)}
+
+/* S3 — front-facing perspective canvas */
+#s3{height:500vh}
+#s3-sticky{position:sticky;top:0;height:100vh;overflow:hidden}
+#s3-canvas{position:absolute;inset:0;width:100%;height:100%}
+.member-panel{position:absolute;top:50%;right:4%;transform:translateY(-50%) translateX(20px);opacity:0;transition:opacity .4s,transform .4s;width:260px;background:rgba(8,8,8,.93);border:1px solid rgba(255,255,255,.1);padding:24px;backdrop-filter:blur(20px);pointer-events:none;z-index:10}
+.member-panel.show{opacity:1;transform:translateY(-50%) translateX(0)}
+.panel-tag{font-size:10px;letter-spacing:4px;color:var(--gold);text-transform:uppercase;margin-bottom:14px}
+.panel-name{font-size:26px;font-weight:700;margin-bottom:4px}
+.panel-en{font-size:11px;color:rgba(255,255,255,.35);letter-spacing:2px;margin-bottom:14px}
+.panel-mbti{display:inline-block;font-size:10px;letter-spacing:2px;border:1px solid rgba(255,255,255,.25);padding:3px 10px;color:rgba(255,255,255,.6)}
+.panel-div{height:1px;background:rgba(255,255,255,.08);margin:14px 0}
+.pi{display:flex;gap:12px;align-items:flex-start;margin-bottom:9px}
+.pi-l{font-size:10px;color:rgba(255,255,255,.3);letter-spacing:1.5px;text-transform:uppercase;min-width:48px;padding-top:1px}
+.pi-v{font-size:13px;color:rgba(255,255,255,.75);line-height:1.5}
+#s3-phase{position:absolute;bottom:7%;left:50%;transform:translateX(-50%);font-size:11px;letter-spacing:4px;text-transform:uppercase;color:rgba(255,255,255,.3);white-space:nowrap;z-index:10}
+
+/* S4 — jump into pot scene */
+#s4{height:400vh;position:relative}
+#s4-sticky{position:sticky;top:0;height:100vh;overflow:hidden;background:#060606;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:20px}
+#s4-canvas{display:block;width:100%;max-width:900px}
+#s4-result-wrap{width:100%;max-width:700px;padding:0 24px;position:relative;z-index:5}
+.result-bar{opacity:0;transform:translateY(30px);transition:opacity .6s,transform .6s}
+.result-bar.show{opacity:1;transform:translateY(0)}
+.result-label{font-size:10px;letter-spacing:5px;color:var(--gold);margin-bottom:20px;text-transform:uppercase;text-align:center}
+.result-eq{display:flex;align-items:center;justify-content:center;gap:24px;flex-wrap:wrap}
+.rm{display:flex;flex-direction:column;align-items:center;gap:8px}
+.ri{font-size:40px}.rn{font-size:11px;letter-spacing:2px;color:rgba(255,255,255,.5)}
+.rplus{font-size:24px;color:rgba(255,255,255,.15)}
+.rcap{font-size:14px;color:rgba(255,255,255,.5);letter-spacing:2px;margin-top:20px;text-align:center}
+#s4-result-wrap{
+  position:absolute;bottom:8%;left:50%;transform:translateX(-50%);
+  z-index:5;width:100%;display:flex;flex-direction:column;align-items:center;
+}
+
+/* S5 */
+#s5{min-height:100vh;background:linear-gradient(to bottom,#0a0a0a,#121008);display:flex;flex-direction:column;align-items:center;justify-content:center;padding:80px 24px;position:relative;overflow:hidden}
+.reality-tag{font-size:10px;letter-spacing:6px;color:var(--gold);text-transform:uppercase;margin-bottom:48px;opacity:.7;text-align:center}
+.cls-scene{width:100%;max-width:900px;background:linear-gradient(to bottom,#1a1610,#161208);border:1px solid rgba(255,255,255,.06);position:relative;overflow:hidden;padding-bottom:60px}
+.cls-ceiling{height:40px;background:#111;border-bottom:2px solid rgba(255,255,255,.04);position:relative}
+.cls-light{position:absolute;top:6px;left:50%;transform:translateX(-50%);width:200px;height:12px;background:rgba(255,255,240,.85);border-radius:2px;box-shadow:0 0 30px 15px rgba(255,255,220,.3),0 0 80px 30px rgba(255,255,200,.1)}
+.cls-light-cone{position:absolute;top:40px;left:50%;transform:translateX(-50%);width:0;height:0;border-left:350px solid transparent;border-right:350px solid transparent;border-top:420px solid rgba(255,255,200,.022);pointer-events:none;z-index:0;filter:blur(12px)}
+.blackboard{margin:32px auto 0;width:88%;max-width:660px;background:linear-gradient(135deg,#1a3328,#1f3d30,#162a22);border:3px solid #2a1e0e;border-radius:3px;padding:24px 32px 20px;position:relative;z-index:2;box-shadow:inset 0 2px 8px rgba(0,0,0,.5),0 4px 20px rgba(0,0,0,.6),0 0 0 8px #1a1008,0 0 0 10px #2a1e0e}
+.bb1{font-size:20px;color:rgba(220,240,220,.8);font-weight:300;letter-spacing:1px;text-align:center;margin-bottom:10px;text-shadow:0 0 8px rgba(200,255,200,.2)}
+.bb2{font-size:14px;color:rgba(180,220,180,.45);letter-spacing:2px;text-align:center}
+.chalk-m{position:absolute;font-style:italic;color:rgba(255,255,255,.06);font-size:14px;pointer-events:none}
+.desks-row{display:flex;justify-content:center;gap:60px;margin-top:40px;padding:0 20px;position:relative;z-index:2}
+.desk-unit{display:flex;flex-direction:column;align-items:center;opacity:0;transform:translateY(20px);transition:opacity .5s,transform .5s}
+.desk-unit.show{opacity:1;transform:translateY(0)}
+.thought{position:absolute;bottom:calc(100% + 8px);left:50%;transform:translateX(-50%);white-space:nowrap;background:rgba(18,18,18,.95);border:1px solid rgba(255,255,255,.12);padding:8px 14px;font-size:12px;color:rgba(255,255,255,.65);letter-spacing:.5px;opacity:0;transition:opacity .4s .3s;backdrop-filter:blur(10px)}
+.thought::after{content:'';position:absolute;top:100%;left:20px;border:5px solid transparent;border-top-color:rgba(255,255,255,.12)}
+.thought::before{content:'';position:absolute;top:calc(100% + 2px);left:22px;border:4px solid transparent;border-top-color:rgba(18,18,18,.95)}
+.desk-unit.show .thought{opacity:1}
+.p-head{width:44px;height:44px;border-radius:50%;margin:0 auto 2px;position:relative;z-index:2;border:1.5px solid rgba(255,255,255,.1)}
+.p-body{width:56px;height:38px;margin:0 auto;border-radius:6px 6px 2px 2px;border:1.5px solid rgba(255,255,255,.08)}
+.desk-surf{width:100px;height:8px;background:linear-gradient(to bottom,#4a3420,#2e1e0e);border-radius:2px;box-shadow:0 3px 8px rgba(0,0,0,.5)}
+.desk-lbl{font-size:11px;letter-spacing:2px;color:rgba(255,255,255,.25);margin-top:8px;text-transform:uppercase}
+
+/* S6 */
+#s6{min-height:100vh;background:#080808;display:flex;flex-direction:column;align-items:center;justify-content:center;padding:80px 24px;position:relative;overflow:hidden}
+.particles{position:absolute;inset:0;pointer-events:none;overflow:hidden}
+.particle{position:absolute;border-radius:50%;animation:pDrift var(--dur,8s) ease-in-out infinite;animation-delay:var(--delay,0s)}
+.laptop-outer{opacity:0;transform:translateY(40px) scale(.96);transition:opacity .8s,transform .8s}
+.laptop-outer.show{opacity:1;transform:translateY(0) scale(1)}
+.lap-top{width:480px;background:linear-gradient(135deg,#1a1a1a,#242424);border:2px solid #333;border-radius:12px 12px 0 0;padding:16px 16px 4px;position:relative;box-shadow:0 -2px 0 rgba(255,255,255,.05) inset,0 30px 60px rgba(0,0,0,.8)}
+.lap-top::before{content:'';position:absolute;top:10px;left:50%;transform:translateX(-50%);width:6px;height:6px;border-radius:50%;background:#2a2a2a;border:1px solid #333}
+.lap-screen{width:100%;background:#0d1520;border-radius:4px;overflow:hidden;aspect-ratio:16/10;position:relative}
+.lap-screen::before{content:'';position:absolute;inset:0;background:radial-gradient(ellipse at 50% 0%,rgba(40,100,180,.2) 0%,transparent 60%)}
+.screen-inner{padding:24px;height:100%;display:flex;flex-direction:column;justify-content:center;align-items:center;gap:12px;text-align:center;position:relative;z-index:1}
+.sc-url{font-size:11px;color:rgba(100,180,255,.4);letter-spacing:1px;font-family:'Courier New',monospace}
+.sc-title{font-size:28px;font-weight:700;color:rgba(255,255,255,.9)}
+.sc-sub{font-size:13px;color:rgba(255,255,255,.35);letter-spacing:1px}
+.lap-hinge{width:100%;height:6px;background:linear-gradient(to bottom,#1a1a1a,#222)}
+.lap-base{width:500px;height:14px;background:linear-gradient(to bottom,#222,#1a1a1a);border-radius:0 0 8px 8px;border:2px solid #2a2a2a;border-top:none;box-shadow:0 8px 30px rgba(0,0,0,.6);position:relative}
+.lap-base::after{content:'';position:absolute;bottom:-4px;left:50%;transform:translateX(-50%);width:100px;height:4px;background:#151515;border-radius:0 0 4px 4px}
+.finale-wrap{margin-top:60px;text-align:center;opacity:0;transform:translateY(20px);transition:opacity .8s .4s,transform .8s .4s}
+.finale-wrap.show{opacity:1;transform:translateY(0)}
+.fin-eye{font-size:11px;letter-spacing:6px;color:var(--gold);text-transform:uppercase;margin-bottom:16px}
+.fin-title{font-size:clamp(32px,6vw,64px);font-weight:700;letter-spacing:-1px}
+.fin-members{font-size:14px;letter-spacing:3px;color:rgba(255,255,255,.3);margin-top:12px}
+.fin-school{font-size:12px;letter-spacing:2px;color:rgba(255,255,255,.15);margin-top:8px}
+
+/* KEYFRAMES */
+@keyframes fadeUp{from{opacity:0;transform:translateY(30px)}to{opacity:1;transform:translateY(0)}}
+@keyframes scrollPulse{0%,100%{opacity:.3}50%{opacity:.8}}
+@keyframes roadScroll{from{transform:translateY(0)}to{transform:translateY(58px)}}
+@keyframes dashScroll{from{background-position:0 0}to{background-position:-170px 0}}
+@keyframes wheelSpin{from{transform:rotate(0deg)}to{transform:rotate(360deg)}}
+@keyframes speedLineAnim{0%{transform:translateX(0);opacity:.8}100%{transform:translateX(-120px);opacity:0}}
+@keyframes cFlyL{0%{opacity:1;transform:translateX(-300px) translateY(-40px) rotate(-15deg)}100%{opacity:0;transform:translate(0,0) rotate(0)}}
+@keyframes cFlyR{0%{opacity:1;transform:translateX(300px) translateY(-40px) rotate(15deg)}100%{opacity:0;transform:translate(0,0) rotate(0)}}
+@keyframes cFlyT{0%{opacity:1;transform:translateX(-50%) translateY(-200px) scale(1.3)}100%{opacity:0;transform:translateX(-50%) scale(1)}}
+@keyframes bigBurst{0%{opacity:0;transform:translate(-50%,-50%) scale(0)}40%{opacity:1;transform:translate(-50%,-50%) scale(1.4)}100%{opacity:0;transform:translate(-50%,-50%) scale(2)}}
+@keyframes ingFly{0%{opacity:0;transform:translate(0,0) scale(0)}50%{opacity:1}100%{opacity:.9;transform:var(--to) scale(1)}}
+@keyframes potShake{0%,100%{transform:scale(1) rotate(0)}20%{transform:scale(1.08) rotate(-6deg)}40%{transform:scale(1.1) rotate(6deg)}60%{transform:scale(1.06) rotate(-3deg)}80%{transform:scale(1.03) rotate(3deg)}}
+@keyframes pDrift{0%,100%{transform:translateY(0) translateX(0);opacity:var(--op,.3)}50%{transform:translateY(var(--dy,-30px)) translateX(var(--dx,15px));opacity:calc(var(--op,.3)*1.5)}}
+</style>
+</head>
+<body>
+<div id="cursor"></div>
+<div id="progress-bar"></div>
+<nav>
+  <div class="nav-logo">NCT Dreams</div>
+  <div class="nav-links">
+    <a href="#s2">팀 소개</a>
+    <a href="#s3">드림카</a>
+    <a href="#s5">교실</a>
+  </div>
+</nav>
+
+<!-- S1 TITLE -->
+<section id="s1">
+  <div class="hwy-bg"></div>
+  <div class="road">
+    <div class="road-surface"></div>
+    <div class="road-center"></div>
+    <div class="road-edge-l"></div>
+    <div class="road-edge-r"></div>
+  </div>
+  <div class="city-glow"></div>
+  <div class="s1-content">
+    <div class="s1-label">Team 03 · 가천 코코네스쿨</div>
+    <div class="s1-title"><span class="nct">NCT</span><span class="dream">Dreams</span></div>
+    <div class="s1-members">So Yoon &nbsp;·&nbsp; Yoo Chung &nbsp;·&nbsp; Tae Hyun</div>
+  </div>
+  <div class="scroll-down"><div class="scroll-line"></div>Scroll</div>
+</section>
+
+<!-- S2 NCT -->
+<section id="s2">
+  <div class="s2-inner">
+    <div>
+      <div class="s2-eyebrow">팀 이름의 의미</div>
+      <div class="s2-heading">세 글자,<br>세 사람.</div>
+      <div class="s2-body"><strong>김소윤</strong>의 N, <strong>원유청</strong>의 C, <strong>이태현</strong>의 T.<br><br>여기에 우리 모두가 공유하는 MBTI <strong>N(직관형)</strong>을 더해 —<br><br>망상과 꿈을 자주 꾸는 우리는 <strong>NCT Dreams</strong>.</div>
+    </div>
+    <div>
+      <div class="nct-row" data-row><div class="nct-letter">N</div><div><div class="nct-name">김소윤</div><div class="nct-desc">ENFJ · UX/AI서비스 · 감성</div></div></div>
+      <div class="nct-row" data-row style="transition-delay:.15s"><div class="nct-letter">C</div><div><div class="nct-name">원유청</div><div class="nct-desc">INTP · 논리 · 아이디어</div></div></div>
+      <div class="nct-row" data-row style="transition-delay:.3s"><div class="nct-letter">T</div><div><div class="nct-name">이태현</div><div class="nct-desc">INTP · 실행력 · 분석</div></div></div>
+    </div>
+  </div>
+</section>
+
+<!-- S3 FRONT-FACING HIGHWAY -->
+<section id="s3">
+  <div id="s3-sticky">
+    <canvas id="s3-canvas"></canvas>
+    <div class="member-panel" id="mp1">
+      <div class="panel-tag">Member 01</div><div class="panel-name">김소윤</div>
+      <div class="panel-en">Kim So Yoon</div><div class="panel-mbti">ENFJ</div>
+      <div class="panel-div"></div>
+      <div class="pi"><span class="pi-l">취미</span><span class="pi-v">그림 그리기, 빵 먹기, 런닝</span></div>
+      <div class="pi"><span class="pi-l">강점</span><span class="pi-v">공감 능력, 분위기 메이커</span></div>
+      <div class="pi"><span class="pi-l">관심</span><span class="pi-v">UX / AI 서비스</span></div>
+    </div>
+    <div class="member-panel" id="mp2">
+      <div class="panel-tag">Member 02</div><div class="panel-name">원유청</div>
+      <div class="panel-en">Won Yoo Chung</div><div class="panel-mbti">INTP</div>
+      <div class="panel-div"></div>
+      <div class="pi"><span class="pi-l">취미</span><span class="pi-v">노래 부르기, 게임, 런닝</span></div>
+      <div class="pi"><span class="pi-l">강점</span><span class="pi-v">논리적 문제해결</span></div>
+      <div class="pi"><span class="pi-l">특기</span><span class="pi-v">아이디어 팩토리</span></div>
+    </div>
+    <div class="member-panel" id="mp3">
+      <div class="panel-tag">Member 03</div><div class="panel-name">이태현</div>
+      <div class="panel-en">Lee Tae Hyun</div><div class="panel-mbti">INTP</div>
+      <div class="panel-div"></div>
+      <div class="pi"><span class="pi-l">취미</span><span class="pi-v">런닝</span></div>
+      <div class="pi"><span class="pi-l">강점</span><span class="pi-v">실행력 &amp; 분석</span></div>
+      <div class="pi"><span class="pi-l">연계</span><span class="pi-v">심오피스 · KAI</span></div>
+    </div>
+    <div id="s3-phase"></div>
+  </div>
+</section>
+
+<!-- S4 JUMP INTO POT -->
+<section id="s4">
+  <div id="s4-sticky">
+    <canvas id="s4-canvas"></canvas>
+    <div id="s4-result-wrap">
+      <div class="result-bar" id="result-bar">
+        <div class="result-label">Result</div>
+        <div class="result-eq">
+          <div class="rm"><div class="ri">🎨</div><div class="rn">So Yoon</div><div class="rn" style="color:rgba(255,255,255,.3)">감성</div></div>
+          <div class="rplus">+</div>
+          <div class="rm"><div class="ri">💡</div><div class="rn">Yoo Chung</div><div class="rn" style="color:rgba(255,255,255,.3)">논리</div></div>
+          <div class="rplus">+</div>
+          <div class="rm"><div class="ri">⚡</div><div class="rn">Tae Hyun</div><div class="rn" style="color:rgba(255,255,255,.3)">실행</div></div>
+          <div class="rplus" style="font-size:20px;color:rgba(255,255,255,.3)">——→</div>
+          <div class="rm"><div class="ri" style="font-size:48px">🍲</div><div class="rn" style="font-size:13px;color:rgba(255,255,255,.7);letter-spacing:1px">NCT Dreams</div></div>
+        </div>
+        <div class="rcap">세 사람이 하나의 팀이 되다</div>
+      </div>
+    </div>
+  </div>
+</section>
+</section>
+
+<!-- S5 CLASSROOM -->
+<section id="s5">
+  <div class="reality-tag">Reality Check</div>
+  <div class="cls-scene">
+    <div class="cls-ceiling"><div class="cls-light"></div></div>
+    <div class="cls-light-cone"></div>
+    <div class="blackboard">
+      <span class="chalk-m" style="top:8px;left:20px">// 오늘 배울 것</span>
+      <span class="chalk-m" style="bottom:6px;right:16px">~~ end</span>
+      <div class="bb1">AI와 스타트업 문제해결</div>
+      <div class="bb2">오늘의 과제 — 팀 소개 발표</div>
+    </div>
+    <div class="desks-row" id="desks">
+      <div class="desk-unit" data-desk>
+        <div style="position:relative"><div class="thought">발표… 어떡하지</div>
+        <div class="p-head" style="background:linear-gradient(135deg,#c4856a,#a06048)"></div>
+        <div class="p-body" style="background:linear-gradient(135deg,#3a2060,#2a1848)"></div></div>
+        <div style="position:relative;width:100px;margin-top:4px"><div class="desk-surf"></div></div>
+        <div class="desk-lbl">소윤</div>
+      </div>
+      <div class="desk-unit" data-desk style="transition-delay:.15s">
+        <div style="position:relative"><div class="thought">코딩… 될까</div>
+        <div class="p-head" style="background:linear-gradient(135deg,#b8946e,#956040)"></div>
+        <div class="p-body" style="background:linear-gradient(135deg,#1a3a50,#122840)"></div></div>
+        <div style="position:relative;width:100px;margin-top:4px"><div class="desk-surf"></div></div>
+        <div class="desk-lbl">유청</div>
+      </div>
+      <div class="desk-unit" data-desk style="transition-delay:.3s">
+        <div style="position:relative"><div class="thought">런닝이나 가고 싶다</div>
+        <div class="p-head" style="background:linear-gradient(135deg,#c49060,#a07040)"></div>
+        <div class="p-body" style="background:linear-gradient(135deg,#1a3020,#102018)"></div></div>
+        <div style="position:relative;width:100px;margin-top:4px"><div class="desk-surf"></div></div>
+        <div class="desk-lbl">태현</div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- S6 FINALE -->
+<section id="s6">
+  <div class="particles" id="particles"></div>
+  <div class="laptop-outer" id="laptop">
+    <div class="lap-top">
+      <div class="lap-screen">
+        <div class="screen-inner">
+          <div class="sc-url">https://nct-dreams.github.io</div>
+          <div class="sc-title">NCT Dreams</div>
+          <div class="sc-sub">가천대 코코네스쿨 · AI와 스타트업 문제해결</div>
+        </div>
+      </div>
+    </div>
+    <div class="lap-hinge"></div>
+    <div class="lap-base"></div>
+  </div>
+  <div class="finale-wrap" id="finale">
+    <div class="fin-eye">망상하는 N들이 모여</div>
+    <div class="fin-title">NCT Dreams</div>
+    <div class="fin-members">So Yoon · Yoo Chung · Tae Hyun</div>
+    <div class="fin-school">Gachon Cocone School · 2026</div>
+  </div>
+</section>
+
+<script>
+// ── Cursor + progress ──
+const cur=document.getElementById('cursor');
+document.addEventListener('mousemove',e=>{cur.style.left=e.clientX+'px';cur.style.top=e.clientY+'px'});
+window.addEventListener('scroll',()=>{document.getElementById('progress-bar').style.width=(window.scrollY/(document.body.scrollHeight-window.innerHeight)*100)+'%'},{passive:true});
+new IntersectionObserver(e=>{if(!e[0].isIntersecting)return;document.querySelectorAll('[data-row]').forEach(r=>r.classList.add('show'))},{threshold:.3}).observe(document.getElementById('s2'));
+
+// ═══════════════════════════════════════
+// SCENE 3 — Canvas: front-facing approach
+// 소실점에서 카메라 향해 한대씩 돌진
+// ═══════════════════════════════════════
+const s3El=document.getElementById('s3');
+const s3cv=document.getElementById('s3-canvas');
+const s3cx=s3cv.getContext('2d');
+const mp1=document.getElementById('mp1'),mp2=document.getElementById('mp2'),mp3=document.getElementById('mp3');
+const phaseEl=document.getElementById('s3-phase');
+
+function s3Resize(){
+  s3cv.width=innerWidth*devicePixelRatio; s3cv.height=innerHeight*devicePixelRatio;
+  s3cv.style.width=innerWidth+'px'; s3cv.style.height=innerHeight+'px';
+}
+s3Resize(); addEventListener('resize',s3Resize);
+
+function lerp(a,b,t){return a+(b-a)*t}
+function pR(p,a,b){return p<=a?0:p>=b?1:(p-a)/(b-a)}
+function eOut(t){return 1-Math.pow(1-t,3)}
+function eIn(t){return t*t*t}
+
+// rounded rect helper
+function rr(ctx,x,y,w,h,r){
+  if(typeof r==='number')r=[r,r,r,r];
+  ctx.beginPath();
+  ctx.moveTo(x+r[0],y);
+  ctx.lineTo(x+w-r[1],y);ctx.arcTo(x+w,y,x+w,y+r[1],r[1]);
+  ctx.lineTo(x+w,y+h-r[2]);ctx.arcTo(x+w,y+h,x+w-r[2],y+h,r[2]);
+  ctx.lineTo(x+r[3],y+h);ctx.arcTo(x,y+h,x,y+h-r[3],r[3]);
+  ctx.lineTo(x,y+r[0]);ctx.arcTo(x,y,x+r[0],y,r[0]);
+  ctx.closePath();
+}
+
+// Car palettes  [bright, mid, dark]
+const COLORS=[
+  ['#e84040','#c02020','#7a0e0e'],
+  ['#2090d0','#1060a0','#072840'],
+  ['#30603a','#1a3a22','#0a1810'],
+];
+// 0=sedan 1=sports 2=suv
+const TYPES=[0,1,2];
+
+function drawBg(ctx,W,H,offset){
+  // sky
+  const sk=ctx.createLinearGradient(0,0,0,H*0.52);
+  sk.addColorStop(0,'#02040e');sk.addColorStop(0.6,'#0a0f1e');sk.addColorStop(0.85,'#150e05');sk.addColorStop(1,'#2a1608');
+  ctx.fillStyle=sk; ctx.fillRect(0,0,W,H*0.52);
+  // stars
+  const dpr=devicePixelRatio;
+  [[.05,.1],[.13,.05],[.22,.18],[.31,.04],[.4,.14],[.5,.07],[.6,.19],[.71,.03],[.82,.11],[.91,.22],[.97,.06],[.08,.28],[.28,.25],[.48,.3],[.68,.26],[.88,.29],[.35,.08],[.78,.15]].forEach(([sx,sy])=>{
+    ctx.beginPath();ctx.arc(sx*W,sy*H*0.45,1.3*dpr,0,Math.PI*2);
+    ctx.fillStyle='rgba(255,255,255,0.65)';ctx.fill();
+  });
+  // city buildings
+  const hy=H*0.52;
+  ctx.fillStyle='#0a0a0a';
+  [[0,.06,.55],[.05,.03,.7],[.09,.04,.5],[.12,.06,.9],[.17,.04,.65],[.2,.05,.5],[.24,.03,.8],
+   [.56,.04,.7],[.61,.06,.9],[.66,.03,.55],[.69,.05,.75],[.73,.04,.5],[.78,.06,.65],
+   [.84,.04,.8],[.87,.03,.5],[.9,.05,.95],[.94,.04,.6],[.97,.03,.7]].forEach(([bx,bw,bh])=>{
+    ctx.fillRect(bx*W, hy-H*0.12*bh, bw*W, H*0.12*bh+2);
+  });
+  // city orange glow
+  const cg=ctx.createRadialGradient(W/2,hy,0,W/2,hy,W*0.5);
+  cg.addColorStop(0,'rgba(255,90,10,.16)');cg.addColorStop(.5,'rgba(200,50,5,.05)');cg.addColorStop(1,'transparent');
+  ctx.fillStyle=cg;ctx.fillRect(0,hy-60,W,90);
+  // road
+  const rg=ctx.createLinearGradient(0,hy,0,H);
+  rg.addColorStop(0,'#141414');rg.addColorStop(.4,'#1c1c1c');rg.addColorStop(1,'#252525');
+  ctx.fillStyle=rg;
+  ctx.beginPath();ctx.moveTo(0,H);ctx.lineTo(W,H);ctx.lineTo(W*.72,hy);ctx.lineTo(W*.28,hy);ctx.fill();
+  // edge lines
+  ctx.strokeStyle='rgba(255,255,255,.22)';ctx.lineWidth=2.5*dpr;
+  ctx.beginPath();ctx.moveTo(W/2,hy);ctx.lineTo(W*.04,H);ctx.stroke();
+  ctx.beginPath();ctx.moveTo(W/2,hy);ctx.lineTo(W*.96,H);ctx.stroke();
+  // dashed center lane markers
+  const N=14;
+  for(let i=0;i<N;i++){
+    const t=((i/N)+(offset*0.0003))%1;
+    const y1=hy+(H-hy)*t, y2=hy+(H-hy)*Math.min(t+0.04,1);
+    const xf=(y1-hy)/(H-hy);
+    const a=Math.min(1,t*3.5);
+    ctx.strokeStyle=`rgba(245,208,96,${.65*a})`;
+    ctx.lineWidth=(0.5+xf*3.5)*dpr;
+    ctx.beginPath();ctx.moveTo(W/2,y1);ctx.lineTo(W/2,y2);ctx.stroke();
+  }
+}
+
+// Draw front-facing car  cx=centerX cy=baseY (bottom of wheels)
+function drawFront(ctx,cx,cy,sc,col,type,blur){
+  const dpr=devicePixelRatio;
+  if(blur>0) ctx.filter=`blur(${blur}px)`;
+  ctx.save();
+
+  const bw=(type===2?130:type===1?120:115)*sc*dpr;
+  const bh=(type===2?75:type===1?52:65)*sc*dpr;
+  const rh=(type===2?44:type===1?30:37)*sc*dpr;
+  const wr=24*sc*dpr; // wheel radius
+
+  const top=cy-wr*0.3-bh;
+  const [c0,c1,c2]=col;
+
+  // ground shadow
+  const shg=ctx.createRadialGradient(cx,cy,0,cx,cy,bw*0.6);
+  shg.addColorStop(0,'rgba(0,0,0,.65)');shg.addColorStop(1,'transparent');
+  ctx.fillStyle=shg;ctx.beginPath();ctx.ellipse(cx,cy,bw*.55,8*sc*dpr,0,0,Math.PI*2);ctx.fill();
+
+  // lower bumper
+  const bumpH=16*sc*dpr;
+  ctx.fillStyle='#181818';
+  rr(ctx,cx-bw/2,top+bh-bumpH,bw,bumpH,[2*sc*dpr,2*sc*dpr,3*sc*dpr,3*sc*dpr]);ctx.fill();
+  // license plate
+  ctx.fillStyle='#e8e8e0';
+  rr(ctx,cx-22*sc*dpr,top+bh-bumpH+3*sc*dpr,44*sc*dpr,11*sc*dpr,2*sc*dpr);ctx.fill();
+  ctx.fillStyle='rgba(0,0,0,.4)';ctx.font=`bold ${7*sc*dpr}px monospace`;ctx.textAlign='center';
+  ctx.fillText('NCT',cx,top+bh-bumpH+11*sc*dpr);
+
+  // main body
+  const bg=ctx.createLinearGradient(cx-bw/2,top,cx+bw/2,top+bh);
+  bg.addColorStop(0,c0);bg.addColorStop(.55,c1);bg.addColorStop(1,c2);
+  ctx.fillStyle=bg;
+  rr(ctx,cx-bw/2,top,bw,bh,[5*sc*dpr,5*sc*dpr,2*sc*dpr,2*sc*dpr]);ctx.fill();
+  // body side highlight
+  ctx.fillStyle='rgba(255,255,255,.06)';
+  rr(ctx,cx-bw/2+5*sc*dpr,top+5*sc*dpr,bw-10*sc*dpr,11*sc*dpr,3*sc*dpr);ctx.fill();
+
+  // roof
+  const roofW=bw*(type===2?.87:.77);
+  const rGrad=ctx.createLinearGradient(cx,top-rh,cx,top);
+  rGrad.addColorStop(0,c2);rGrad.addColorStop(1,c1);
+  ctx.fillStyle=rGrad;
+  rr(ctx,cx-roofW/2,top-rh,roofW,rh,[10*sc*dpr,10*sc*dpr,0,0]);ctx.fill();
+  // roof rack (SUV)
+  if(type===2){
+    ctx.fillStyle='#0e1e0e';
+    rr(ctx,cx-roofW/2+8*sc*dpr,top-rh-3*sc*dpr,roofW-16*sc*dpr,4*sc*dpr,1.5*sc*dpr);ctx.fill();
+  }
+
+  // windshield
+  const wsW=roofW*.9, wsH=rh*.88;
+  const wg=ctx.createLinearGradient(0,top-wsH,0,top);
+  wg.addColorStop(0,'rgba(120,195,255,.38)');wg.addColorStop(.3,'rgba(90,160,240,.22)');wg.addColorStop(1,'rgba(50,110,200,.1)');
+  ctx.fillStyle=wg;
+  rr(ctx,cx-wsW/2,top-wsH+2*sc*dpr,wsW,wsH,[7*sc*dpr,7*sc*dpr,2*sc*dpr,2*sc*dpr]);ctx.fill();
+  // glass shine
+  ctx.fillStyle='rgba(255,255,255,.12)';
+  rr(ctx,cx-wsW/2+8*sc*dpr,top-wsH+7*sc*dpr,wsW*.32,wsH*.38,3*sc*dpr);ctx.fill();
+
+  // A-pillars
+  ctx.strokeStyle='rgba(0,0,0,.45)';ctx.lineWidth=3*sc*dpr;
+  ctx.beginPath();ctx.moveTo(cx-wsW/2,top);ctx.lineTo(cx-roofW/2,top-rh);ctx.stroke();
+  ctx.beginPath();ctx.moveTo(cx+wsW/2,top);ctx.lineTo(cx+roofW/2,top-rh);ctx.stroke();
+
+  // door vertical seams
+  ctx.strokeStyle='rgba(0,0,0,.28)';ctx.lineWidth=1.5*sc*dpr;
+  [-0.36,0,0.36].forEach(f=>{
+    ctx.beginPath();ctx.moveTo(cx+f*bw,top+2*sc*dpr);ctx.lineTo(cx+f*bw,top+bh-bumpH);ctx.stroke();
+  });
+  // door handles
+  ctx.fillStyle='rgba(255,255,255,.28)';
+  [[-0.17,0],[0.17,0]].forEach(([fx])=>{
+    rr(ctx,cx+fx*bw-8*sc*dpr,top+bh*.48,18*sc*dpr,4*sc*dpr,2*sc*dpr);ctx.fill();
+  });
+
+  // headlights
+  [-1,1].forEach(side=>{
+    const hx=cx+side*bw*.38, hy2=top+bh*.27;
+    const hlW=28*sc*dpr, hlH=13*sc*dpr;
+    // glow halo
+    const hg=ctx.createRadialGradient(hx,hy2,0,hx,hy2,hlW*1.2);
+    hg.addColorStop(0,'rgba(255,250,200,.85)');hg.addColorStop(.45,'rgba(255,235,130,.35)');hg.addColorStop(1,'transparent');
+    ctx.fillStyle=hg;ctx.beginPath();ctx.ellipse(hx,hy2,hlW,hlH*1.5,0,0,Math.PI*2);ctx.fill();
+    // housing
+    rr(ctx,hx-hlW*.72,hy2-hlH*.62,hlW*1.44,hlH*1.24,3*sc*dpr);
+    const hf=ctx.createLinearGradient(hx-hlW,hy2-hlH,hx+hlW,hy2+hlH);
+    hf.addColorStop(0,'#fffde0');hf.addColorStop(1,'#f0d060');
+    ctx.fillStyle=hf;ctx.fill();
+    // inner white
+    ctx.fillStyle='white';ctx.beginPath();ctx.ellipse(hx,hy2,hlW*.33,hlH*.52,0,0,Math.PI*2);ctx.fill();
+    // DRL
+    ctx.fillStyle='rgba(255,240,160,.8)';
+    rr(ctx,hx-hlW*.62,hy2+hlH*.72,hlW*1.24,3.5*sc*dpr,1.5*sc*dpr);ctx.fill();
+    // beam on road (close cars)
+    if(sc>.45){
+      const ba=Math.min(1,(sc-.45)*2)*.18;
+      const bg2=ctx.createLinearGradient(hx,hy2,hx+side*400*sc*dpr,cy+120*sc*dpr);
+      bg2.addColorStop(0,`rgba(255,248,180,${ba})`);bg2.addColorStop(1,'transparent');
+      ctx.fillStyle=bg2;
+      ctx.beginPath();ctx.moveTo(hx,hy2);ctx.lineTo(hx+side*22*sc*dpr,cy);ctx.lineTo(hx+side*350*sc*dpr,cy+100*sc*dpr);ctx.fill();
+    }
+  });
+
+  // grille
+  const grW=bw*.46, grH=18*sc*dpr, grY=top+bh*.58;
+  ctx.fillStyle='#111';rr(ctx,cx-grW/2,grY-grH/2,grW,grH,3*sc*dpr);ctx.fill();
+  ctx.strokeStyle='rgba(255,255,255,.09)';ctx.lineWidth=1.5*sc*dpr;
+  for(let g=0;g<5;g++){ctx.beginPath();const gx=cx-grW/2+(g+.5)*grW/5;ctx.moveTo(gx,grY-grH/2+3*sc*dpr);ctx.lineTo(gx,grY+grH/2-3*sc*dpr);ctx.stroke();}
+
+  // fog lights
+  [-1,1].forEach(side=>{
+    const fx=cx+side*bw*.25, fy2=top+bh*.76;
+    ctx.fillStyle='rgba(255,228,100,.65)';ctx.beginPath();ctx.ellipse(fx,fy2,8*sc*dpr,5*sc*dpr,0,0,Math.PI*2);ctx.fill();
+  });
+
+  // wheels — perspective ellipse
+  const wOffX=bw*.43;
+  [-1,1].forEach(side=>{
+    const wx=cx+side*wOffX, wy=cy-wr*.18;
+    const wRy=wr*.52; // squish for perspective
+    const tg=ctx.createRadialGradient(wx-wr*.18,wy-wr*.18,0,wx,wy,wr);
+    tg.addColorStop(0,'#3a3a3a');tg.addColorStop(1,'#0d0d0d');
+    ctx.fillStyle=tg;ctx.beginPath();ctx.ellipse(wx,wy,wr,wRy,0,0,Math.PI*2);ctx.fill();
+    // rim
+    const rg2=ctx.createRadialGradient(wx-wr*.14,wy-wr*.14,0,wx,wy,wr*.65);
+    rg2.addColorStop(0,'#d5d5d5');rg2.addColorStop(.5,'#888');rg2.addColorStop(1,'#444');
+    ctx.fillStyle=rg2;ctx.beginPath();ctx.ellipse(wx,wy,wr*.65,wRy*.65,0,0,Math.PI*2);ctx.fill();
+    // spokes
+    ctx.strokeStyle='rgba(190,190,190,.75)';ctx.lineWidth=2*sc*dpr;
+    for(let s=0;s<5;s++){
+      const a=s/5*Math.PI;
+      ctx.beginPath();ctx.moveTo(wx-Math.cos(a)*wr*.6,wy-Math.sin(a)*wRy*.6);
+      ctx.lineTo(wx+Math.cos(a)*wr*.6,wy+Math.sin(a)*wRy*.6);ctx.stroke();
+    }
+    // hub
+    ctx.fillStyle='#aaa';ctx.beginPath();ctx.ellipse(wx,wy,wr*.14,wRy*.14,0,0,Math.PI*2);ctx.fill();
+  });
+
+  // SUV spoiler on top
+  if(type===2){
+    ctx.fillStyle='#0e1e0e';
+    rr(ctx,cx-roofW/2+6*sc*dpr,top-rh-8*sc*dpr,roofW-12*sc*dpr,7*sc*dpr,1.5*sc*dpr);ctx.fill();
+  }
+  // Sports low hood scoop
+  if(type===1){
+    ctx.fillStyle='rgba(0,0,0,.5)';rr(ctx,cx-18*sc*dpr,top+2*sc*dpr,36*sc*dpr,8*sc*dpr,2*sc*dpr);ctx.fill();
+  }
+
+  ctx.filter='none';
+  ctx.restore();
+}
+
+let s3DashOff=0, s3LastY=scrollY;
+
+function drawS3(){
+  const W=s3cv.width, H=s3cv.height, dpr=devicePixelRatio;
+  s3cx.clearRect(0,0,W,H);
+  s3cx.globalAlpha=1; s3cx.filter='none';
+
+  const rect=s3El.getBoundingClientRect();
+  const p=Math.max(0,Math.min(1,-rect.top/(s3El.offsetHeight-innerHeight)));
+  s3DashOff+=scrollY-s3LastY; s3LastY=scrollY;
+
+  drawBg(s3cx,W,H,s3DashOff);
+
+  const vpX=W/2, vpY=H*.52, gY=H*.98;
+
+  // 3 cars, each owns 1/3 of scroll range
+  for(let i=0;i<3;i++){
+    const ps=(i)/3, pe=(i+1)/3;
+    const lp=pR(p,ps,pe);
+
+    // local phases
+    const approach=eOut(pR(lp,0,.42));   // tiny→large
+    const spotlight=pR(lp,.42,.70);       // hold center
+    const blast=eIn(pR(lp,.70,1));        // surge past camera
+
+    // future cars wait tiny at vp
+    let sc, cx, cy, al, bl;
+    if(lp<=0){
+      sc=.04; cx=vpX+[-0.16,0,0.16][i]*W; cy=vpY+10*dpr; al=.28; bl=0;
+    } else if(lp>=1){
+      continue; // already gone
+    } else if(lp<.42){
+      // APPROACH: scale up from vp toward camera
+      sc=.04+approach*.65;
+      const lat=[-0.16,0,0.16][i]*W*(1-approach);
+      cx=vpX+lat;
+      cy=vpY+(gY-vpY)*approach;
+      al=Math.min(1,approach*3.5);
+      bl=(1-approach)*.6;
+    } else if(lp<.70){
+      // SPOTLIGHT: car fills screen, member card shows
+      sc=.69+spotlight*.18;
+      cx=vpX; cy=gY-sc*30*dpr;
+      al=1; bl=0;
+    } else {
+      // BLAST: surge toward & past camera
+      sc=.87+blast*4.5;
+      cx=vpX; cy=gY+blast*H*.5;
+      al=1-blast*blast; bl=blast*5;
+    }
+
+    // dim cars that are not "current" (upcoming cars — show faint at vp)
+    const isCur=(lp>0&&lp<1);
+
+    s3cx.save();
+    s3cx.globalAlpha=Math.max(0,Math.min(1,al));
+    drawFront(s3cx,cx,cy,sc,COLORS[i],TYPES[i],bl);
+    s3cx.restore();
+
+    // show member panel during spotlight
+    const inSpot=spotlight>0.12&&spotlight<0.88;
+    if(i===0) mp1.classList.toggle('show',inSpot);
+    if(i===1) mp2.classList.toggle('show',inSpot);
+    if(i===2) mp3.classList.toggle('show',inSpot);
+  }
+
+  // phase label
+  const ci=Math.min(2,Math.floor(p*3));
+  const lp2=pR(p,ci/3,(ci+1)/3);
+  const inSp=lp2>.12&&lp2<.88;
+  if(mp1.classList.contains('show'))      phaseEl.textContent='KIM SO YOON';
+  else if(mp2.classList.contains('show')) phaseEl.textContent='WON YOO CHUNG';
+  else if(mp3.classList.contains('show')) phaseEl.textContent='LEE TAE HYUN';
+  else if(p<.05)                          phaseEl.textContent='INCOMING';
+  else                                    phaseEl.textContent='';
+
+  requestAnimationFrame(drawS3);
+}
+drawS3();
+
+// ═══════════════════════════════════════
+// SCENE 4 — Canvas: 자동차 포물선 점프 + 냄비
+// Physics: 오른쪽에서 달려와 → 냄비 앞에서 jump
+// 3대가 순차적으로 점프, 폭발, 결과
+// ═══════════════════════════════════════
+const s4El=document.getElementById('s4');
+const s4cv=document.getElementById('s4-canvas');
+const s4cx=s4cv.getContext('2d');
+
+function s4Resize(){
+  const W2=Math.min(900,innerWidth)*devicePixelRatio;
+  const H2=Math.min(520,innerHeight*0.65)*devicePixelRatio;
+  s4cv.width=W2; s4cv.height=H2;
+  s4cv.style.width=Math.min(900,innerWidth)+'px';
+  s4cv.style.height=Math.min(520,innerHeight*0.65)+'px';
+}
+s4Resize(); addEventListener('resize',s4Resize);
+
+// ── round rect helper (same as above) ──
+function rr2(ctx,x,y,w,h,r){rr(ctx,x,y,w,h,r);}
+
+// ── draw side-view car for S4 ──
+function sidecar(ctx,cx,cy,sc,col,type){
+  const dpr=devicePixelRatio;
+  const bw=(type===2?100:type===1?108:95)*sc*dpr;
+  const bh=(type===2?40:type===1?30:36)*sc*dpr;
+  const rh=(type===2?28:type===1?22:26)*sc*dpr;
+  const wr=(type===2?17:15)*sc*dpr;
+  const [c0,c1,c2]=col;
+
+  // shadow
+  ctx.fillStyle='rgba(0,0,0,.4)';ctx.beginPath();ctx.ellipse(cx,cy+2*dpr,bw*.5,5*sc*dpr,0,0,Math.PI*2);ctx.fill();
+
+  // body
+  const bg=ctx.createLinearGradient(cx-bw/2,cy-bh,cx+bw/2,cy);
+  bg.addColorStop(0,c0);bg.addColorStop(.5,c1);bg.addColorStop(1,c2);
+  ctx.fillStyle=bg;rr(ctx,cx-bw/2,cy-bh,bw,bh,4*sc*dpr);ctx.fill();
+
+  // roof
+  const roOff=(type===1?bw*.17:type===2?bw*.11:bw*.13);
+  const roW=bw-roOff*2.1;
+  const rog=ctx.createLinearGradient(cx,cy-bh-rh,cx,cy-bh);
+  rog.addColorStop(0,c2);rog.addColorStop(1,c1);
+  ctx.fillStyle=rog;rr(ctx,cx-roW/2,cy-bh-rh,roW,rh,[8*sc*dpr,8*sc*dpr,0,0]);ctx.fill();
+
+  // window
+  const wg=ctx.createLinearGradient(cx-roW/2,cy-bh-rh,cx+roW/2,cy-bh);
+  wg.addColorStop(0,'rgba(130,200,255,.36)');wg.addColorStop(1,'rgba(50,110,200,.12)');
+  ctx.fillStyle=wg;rr(ctx,cx-roW/2+4*sc*dpr,cy-bh-rh+4*sc*dpr,roW-8*sc*dpr,rh-6*sc*dpr,5*sc*dpr);ctx.fill();
+
+  // headlight (right=front)
+  const hg2=ctx.createRadialGradient(cx+bw/2-5*sc*dpr,cy-bh*.56,0,cx+bw/2-5*sc*dpr,cy-bh*.56,14*sc*dpr);
+  hg2.addColorStop(0,'rgba(255,248,180,.9)');hg2.addColorStop(.5,'rgba(255,230,100,.35)');hg2.addColorStop(1,'transparent');
+  ctx.fillStyle=hg2;ctx.beginPath();ctx.ellipse(cx+bw/2-5*sc*dpr,cy-bh*.56,12*sc*dpr,7*sc*dpr,0,0,Math.PI*2);ctx.fill();
+
+  // taillight
+  ctx.fillStyle='rgba(255,20,10,.85)';rr(ctx,cx-bw/2,cy-bh*.72,5*sc*dpr,17*sc*dpr,2*sc*dpr);ctx.fill();
+
+  // door line
+  ctx.strokeStyle='rgba(0,0,0,.25)';ctx.lineWidth=1.5*sc*dpr;
+  ctx.beginPath();ctx.moveTo(cx+bw*.04,cy-bh+2*sc*dpr);ctx.lineTo(cx+bw*.04,cy);ctx.stroke();
+
+  // wheels
+  [bw*.29,-bw*.27].forEach(wo=>{
+    const wx=cx+wo,wy=cy;
+    const tg=ctx.createRadialGradient(wx-wr*.2,wy-wr*.2,0,wx,wy,wr);
+    tg.addColorStop(0,'#3a3a3a');tg.addColorStop(1,'#0d0d0d');
+    ctx.fillStyle=tg;ctx.beginPath();ctx.arc(wx,wy,wr,0,Math.PI*2);ctx.fill();
+    const rg=ctx.createRadialGradient(wx-wr*.14,wy-wr*.14,0,wx,wy,wr*.65);
+    rg.addColorStop(0,'#d0d0d0');rg.addColorStop(.5,'#888');rg.addColorStop(1,'#444');
+    ctx.fillStyle=rg;ctx.beginPath();ctx.arc(wx,wy,wr*.65,0,Math.PI*2);ctx.fill();
+    ctx.strokeStyle='rgba(180,180,180,.7)';ctx.lineWidth=1.5*sc*dpr;
+    for(let s=0;s<5;s++){const a=s/5*Math.PI*2;ctx.beginPath();ctx.moveTo(wx,wy);ctx.lineTo(wx+Math.cos(a)*wr*.58,wy+Math.sin(a)*wr*.58);ctx.stroke();}
+  });
+  // wheel arches
+  ctx.strokeStyle='rgba(0,0,0,.4)';ctx.lineWidth=3*sc*dpr;
+  [bw*.29,-bw*.27].forEach(wo=>{ctx.beginPath();ctx.arc(cx+wo,cy,wr+3*sc*dpr,Math.PI,0);ctx.stroke();});
+}
+
+function drawPot(ctx,cx,cy,r,shake){
+  const dpr=devicePixelRatio;
+  const sx=Math.sin(shake*40)*shake*7*dpr;
+  ctx.save();ctx.translate(sx,0);
+
+  // shadow
+  ctx.fillStyle='rgba(0,0,0,.45)';ctx.beginPath();ctx.ellipse(cx,cy+r*.08,r*1.25,r*.19,0,0,Math.PI*2);ctx.fill();
+
+  // pot body
+  const pg=ctx.createLinearGradient(cx-r,cy-r,cx+r,cy+r);
+  pg.addColorStop(0,'#555');pg.addColorStop(.3,'#3c3c3c');pg.addColorStop(.7,'#282828');pg.addColorStop(1,'#151515');
+  ctx.fillStyle=pg;
+  ctx.beginPath();
+  ctx.moveTo(cx-r*.72,cy-r*.08);
+  ctx.bezierCurveTo(cx-r*.88,cy+r*.62,cx-r*.76,cy+r*.92,cx-r*.52,cy+r*.97);
+  ctx.lineTo(cx+r*.52,cy+r*.97);
+  ctx.bezierCurveTo(cx+r*.76,cy+r*.92,cx+r*.88,cy+r*.62,cx+r*.72,cy-r*.08);
+  ctx.closePath();ctx.fill();
+
+  // rim
+  const rimG=ctx.createLinearGradient(0,cy-r*.27,0,cy+r*.06);
+  rimG.addColorStop(0,'#6a6a6a');rimG.addColorStop(1,'#333');
+  ctx.fillStyle=rimG;ctx.beginPath();ctx.ellipse(cx,cy-r*.1,r*.76,r*.19,0,0,Math.PI*2);ctx.fill();
+  ctx.strokeStyle='rgba(255,255,255,.18)';ctx.lineWidth=2*dpr;
+  ctx.beginPath();ctx.ellipse(cx,cy-r*.12,r*.73,r*.16,0,0,Math.PI*2);ctx.stroke();
+
+  // boiling bubbles
+  const t=Date.now()/800;
+  for(let b=0;b<4;b++){
+    const bx=cx+(b-1.5)*r*.2, by=cy-r*.1-Math.sin(t*2+b)*8*dpr-12*dpr;
+    const ba=.12+Math.sin(t*3+b)*.06;
+    ctx.fillStyle=`rgba(255,255,255,${ba})`;ctx.beginPath();ctx.ellipse(bx,by,5*dpr,7*dpr,0,0,Math.PI*2);ctx.fill();
+  }
+
+  // handles
+  [-1,1].forEach(s=>{
+    ctx.fillStyle='#444';ctx.beginPath();ctx.ellipse(cx+s*r*.82,cy,r*.13,r*.065,s*.4,0,Math.PI*2);ctx.fill();
+  });
+
+  // inner pot contents (stew)
+  ctx.fillStyle='rgba(180,80,20,.6)';ctx.beginPath();ctx.ellipse(cx,cy-r*.1,r*.65,r*.12,0,0,Math.PI*2);ctx.fill();
+
+  ctx.restore();
+}
+
+// ── particle system ──
+let ptcls=[];
+function boom(cx,cy,W,H){
+  const dpr=devicePixelRatio;
+  const cols=['#ff4010','#ff8020','#ffcc30','#ff2000','#fff060','#c8a84b','#ffffff'];
+  for(let i=0;i<70;i++){
+    const a=Math.random()*Math.PI*2, sp=4+Math.random()*10;
+    ptcls.push({x:cx,y:cy,vx:Math.cos(a)*sp,vy:Math.sin(a)*sp-5,
+      life:1,dec:.012+Math.random()*.018,sz:3+Math.random()*9,
+      col:cols[Math.floor(Math.random()*cols.length)],type:Math.random()>.45?'o':'s'});
+  }
+  // debris
+  for(let i=0;i<18;i++){
+    const a=-Math.PI/2+(Math.random()-.5)*Math.PI*.9, sp=6+Math.random()*12;
+    ptcls.push({x:cx,y:cy,vx:Math.cos(a)*sp,vy:Math.sin(a)*sp-7,
+      life:1,dec:.008+Math.random()*.012,sz:7+Math.random()*14,
+      col:['#c02010','#1060a0','#1a3822'][Math.floor(Math.random()*3)],
+      type:'r',rot:Math.random()*360,spin:(Math.random()-.5)*25});
+  }
+}
+
+function updatePtcls(dt){
+  const dpr=devicePixelRatio, fy=s4cv.height*.78;
+  ptcls.forEach(p=>{
+    p.x+=p.vx*dpr; p.y+=p.vy*dpr;
+    p.vy+=14*dpr*dt*60; p.vx*=.985;
+    // bounce off floor with damping
+    if(p.y>fy&&p.vy>0){p.y=fy;p.vy*=-.4;p.vx*=.7;}
+    p.life-=p.dec*60*dt;
+  });
+  ptcls=ptcls.filter(p=>p.life>0);
+}
+
+function drawPtcls(ctx){
+  ptcls.forEach(p=>{
+    ctx.save();ctx.globalAlpha=Math.max(0,p.life);
+    if(p.type==='s'){
+      ctx.strokeStyle=p.col;ctx.lineWidth=2*devicePixelRatio;
+      ctx.beginPath();ctx.moveTo(p.x,p.y);ctx.lineTo(p.x-p.vx*4*devicePixelRatio,p.y-p.vy*4*devicePixelRatio);ctx.stroke();
+    } else if(p.type==='r'){
+      p.rot=(p.rot||0)+(p.spin||0);
+      ctx.translate(p.x,p.y);ctx.rotate(p.rot*Math.PI/180);
+      ctx.fillStyle=p.col;ctx.fillRect(-p.sz*devicePixelRatio/2,-p.sz*devicePixelRatio/2,p.sz*devicePixelRatio,p.sz*devicePixelRatio*.6);
+    } else {
+      ctx.fillStyle=p.col;ctx.beginPath();
+      ctx.arc(p.x,p.y,Math.max(.5,p.sz*devicePixelRatio*p.life*.5),0,Math.PI*2);ctx.fill();
+    }
+    ctx.restore();
+  });
+}
+
+function drawFloor(ctx,W,H){
+  const fy=H*.78, dpr=devicePixelRatio;
+  const fg=ctx.createLinearGradient(0,fy,0,H);
+  fg.addColorStop(0,'#1a1a1a');fg.addColorStop(1,'#0a0a0a');
+  ctx.fillStyle=fg;ctx.fillRect(0,fy,W,H-fy);
+  ctx.strokeStyle='rgba(255,255,255,.1)';ctx.lineWidth=2*dpr;
+  ctx.beginPath();ctx.moveTo(0,fy);ctx.lineTo(W,fy);ctx.stroke();
+  // subtle perspective grid
+  const vx=W/2;
+  ctx.strokeStyle='rgba(255,255,255,.04)';ctx.lineWidth=1*dpr;
+  for(let gx=0;gx<W;gx+=W/12){
+    ctx.beginPath();ctx.moveTo(gx,fy);ctx.lineTo(vx+(gx-vx)*.05,H);ctx.stroke();
+  }
+  for(let i=1;i<4;i++){
+    const gy=fy+(H-fy)*i/4;
+    ctx.beginPath();ctx.moveTo(0,gy);ctx.lineTo(W,gy);ctx.stroke();
+  }
+}
+
+// ── Car states for S4 ──
+const S4_CARS=[
+  {color:COLORS[0],type:0,label:'소윤',delay:0},
+  {color:COLORS[1],type:1,label:'유청',delay:1.1},
+  {color:COLORS[2],type:2,label:'태현',delay:2.2},
+];
+
+let s4t=0, s4lt=0, s4run=false, s4boom=false, s4res=false;
+const s4cs=S4_CARS.map(()=>({x:0,y:0,vx:0,vy:0,phase:'wait',angle:0,trail:[],alpha:1}));
+
+function s4reset(){
+  s4t=0; s4lt=0; s4boom=false; s4res=false; ptcls=[];
+  document.getElementById('result-bar').classList.remove('show');
+  const W=s4cv.width, H=s4cv.height;
+  s4cs.forEach((st,i)=>{
+    st.x=-120*devicePixelRatio; st.y=H*.78;
+    st.vx=W*(0.48+i*.05); st.vy=0;
+    st.phase='wait'; st.angle=0; st.trail=[]; st.alpha=1;
+  });
+}
+
+let s4boomCount=0;
+let s4boomTime=[];
+
+function tickS4(ts){
+  if(!s4run) return;
+  const dt=Math.min(.05,(ts-s4lt)/1000); s4lt=ts; s4t+=dt;
+  const W=s4cv.width, H=s4cv.height, dpr=devicePixelRatio;
+  const fy=H*.78;
+  const px=W*.5, pr=W*.09;
+  const potCY=fy-pr*.85;
+
+  s4cx.clearRect(0,0,W,H);
+  s4cx.fillStyle='#060606';s4cx.fillRect(0,0,W,H);
+  drawFloor(s4cx,W,H);
+
+  // pot shake on first boom
+  const shakeT=s4boomTime.length>0?s4t-s4boomTime[0]:0;
+  const shake=Math.max(0,.7-shakeT*1.8);
+  drawPot(s4cx,px,potCY,pr,s4boom?shake:0);
+
+  // update particles
+  updatePtcls(dt);
+  drawPtcls(s4cx);
+
+  // ── Update & draw each car ──
+  let allDone=true;
+  for(let i=0;i<3;i++){
+    const car=S4_CARS[i], st=s4cs[i];
+    const launchT=car.delay;
+
+    if(st.phase==='wait'){
+      if(s4t<launchT){allDone=false;continue;}
+      st.phase='roll';
+    }
+
+    if(st.phase==='roll'){
+      allDone=false;
+      const spd=car.type===1?W*.58:car.type===2?W*.50:W*.54;
+      st.x+=spd*dt;
+      const jumpX=px-pr*2.0;
+      if(st.x>=jumpX){
+        st.phase='jump';
+        st.jumpVx=spd*.95;
+        st.vy=-(H*.018+pr*.8)*60*dt; // strong launch
+        st.jumpT=s4t;
+      }
+    }
+
+    if(st.phase==='jump'){
+      allDone=false;
+      const g=H*1.05; // gravity pixels/s²
+      st.x+=st.jumpVx*dt;
+      st.vy+=g*dt;
+      st.y+=st.vy;
+      // lean nose-down as apex passes
+      const apex=st.vy>0;
+      st.angle=apex?Math.min(.5,(s4t-st.jumpT)*.8):Math.min(.22,(s4t-st.jumpT)*.4);
+      st.trail.push({x:st.x,y:st.y});
+      if(st.trail.length>28) st.trail.shift();
+
+      // hit detection: car center near pot top
+      const dx=st.x-px, dy=(st.y-40*dpr)-potCY;
+      if(Math.sqrt(dx*dx+dy*dy)<pr*1.05&&st.y<potCY+pr*1.2){
+        st.phase='hit'; st.hitT=s4t;
+        s4boom=true;
+        s4boomCount++;
+        s4boomTime.push(s4t);
+        boom(px,potCY-pr*.4,W,H);
+      }
+      // miss (fell below floor)
+      if(st.y>fy+100*dpr){st.phase='gone';st.alpha=0;}
+    }
+
+    if(st.phase==='hit'){
+      const el=s4t-st.hitT;
+      st.alpha=Math.max(0,1-el*3.5);
+      st.y+=el*180*dpr*dt;
+      if(el>.55){st.phase='gone';st.alpha=0;}
+      else allDone=false;
+    }
+
+    if(st.phase==='gone') continue;
+    allDone=false;
+
+    // draw trail
+    if(st.trail.length>1){
+      const rgb=i===0?'220,50,20':i===1?'20,100,200':'30,90,40';
+      for(let j=1;j<st.trail.length;j++){
+        const t2=j/st.trail.length;
+        s4cx.strokeStyle=`rgba(${rgb},${t2*.25})`;
+        s4cx.lineWidth=t2*5*dpr;
+        s4cx.beginPath();s4cx.moveTo(st.trail[j-1].x,st.trail[j-1].y);s4cx.lineTo(st.trail[j].x,st.trail[j].y);s4cx.stroke();
+      }
+    }
+
+    // draw car
+    s4cx.save();
+    s4cx.globalAlpha=Math.max(0,st.alpha);
+    s4cx.translate(st.x,st.y);
+    s4cx.rotate(st.angle);
+    sidecar(s4cx,0,0,0.58,car.color,car.type);
+    s4cx.restore();
+
+    // label during roll
+    if(st.phase==='roll'&&st.x>0&&st.x<W*.55){
+      s4cx.save();s4cx.globalAlpha=.75;s4cx.fillStyle='#c8a84b';
+      s4cx.font=`${11*dpr}px Inter,sans-serif`;s4cx.textAlign='center';
+      s4cx.fillText(car.label,st.x,st.y-70*dpr);
+      s4cx.restore();
+    }
+  }
+
+  // show result when all done + particles settling
+  if(s4boom&&!s4res&&ptcls.length<15&&s4boomCount===3){
+    s4res=true;
+    setTimeout(()=>document.getElementById('result-bar').classList.add('show'),400);
+  }
+
+  requestAnimationFrame(tickS4);
+}
+
+// trigger S4 on enter viewport
+let s4obs=false;
+new IntersectionObserver(e=>{
+  if(!e[0].isIntersecting||s4obs) return;
+  s4obs=true; s4reset(); s4run=true; s4lt=performance.now(); tickS4(s4lt);
+},{threshold:.25}).observe(s4cv);
+
+// ── remaining sections ──
+new IntersectionObserver(e=>{if(!e[0].isIntersecting)return;document.querySelectorAll('[data-desk]').forEach(d=>d.classList.add('show'))},{threshold:.3}).observe(document.getElementById('desks'));
+new IntersectionObserver(e=>{
+  if(!e[0].isIntersecting)return;
+  document.getElementById('laptop').classList.add('show');
+  setTimeout(()=>document.getElementById('finale').classList.add('show'),400);
+  const wrap=document.getElementById('particles');wrap.innerHTML='';
+  const cols=['rgba(200,168,75,.4)','rgba(255,255,255,.15)','rgba(100,160,255,.2)'];
+  for(let i=0;i<20;i++){const el=document.createElement('div');el.className='particle';const sz=2+Math.random()*4;el.style.cssText=`width:${sz}px;height:${sz}px;background:${cols[i%3]};left:${Math.random()*100}%;top:${20+Math.random()*60}%;--dur:${5+Math.random()*8}s;--delay:${Math.random()*5}s;--dy:${-20-Math.random()*40}px;--dx:${-20+Math.random()*40}px;--op:${.2+Math.random()*.4};`;wrap.appendChild(el)}
+},{threshold:.3}).observe(document.getElementById('s6'));
+</script>
+</body>
+</html>
