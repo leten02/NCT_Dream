@@ -1,0 +1,39 @@
+const fs = require('fs');
+
+const html = `
+<!DOCTYPE html>
+<html>
+<head>
+<script src="https://cdn.tailwindcss.com"></script>
+<style>
+  body { margin: 0; overflow: hidden; }
+  .bg {
+    position: absolute;
+    inset: 0;
+    width: 100%;
+    height: 100%;
+    background-image: url('background.png');
+    background-size: cover;
+    background-position: bottom;
+    background-repeat: no-repeat;
+    opacity: 0.5;
+  }
+  .svg-container {
+    position: absolute;
+    inset: 0;
+    width: 100%;
+    height: 100%;
+    pointer-events: none;
+  }
+</style>
+</head>
+<body>
+  <div class="bg"></div>
+  <svg class="svg-container" viewBox="0 0 6000 3348" preserveAspectRatio="xMidYMax slice">
+    <rect x="1692" y="1070" width="2624" height="1632" fill="rgba(255,0,0,0.5)" />
+  </svg>
+</body>
+</html>
+`;
+
+fs.writeFileSync('public/test2.html', html);

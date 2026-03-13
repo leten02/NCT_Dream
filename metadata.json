@@ -1,0 +1,5 @@
+{
+  "name": "NCT Dreams Stage",
+  "description": "An interactive stage entrance experience for NCT Dreams.",
+  "requestFramePermissions": ["microphone"]
+}

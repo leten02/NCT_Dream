@@ -1,0 +1,19 @@
+const fs = require('fs');
+
+const html = `
+<!DOCTYPE html>
+<html>
+<head>
+<script src="https://cdn.tailwindcss.com"></script>
+</head>
+<body>
+  <div class="w-[1000px] h-[1000px] border-4 border-red-500 overflow-hidden relative flex justify-center items-end">
+    <div class="relative min-w-full min-h-full aspect-[6000/3348] w-auto h-auto flex-shrink-0 bg-blue-500 opacity-50">
+      <div class="absolute inset-0 border-4 border-blue-900"></div>
+    </div>
+  </div>
+</body>
+</html>
+`;
+
+fs.writeFileSync('public/test.html', html);
