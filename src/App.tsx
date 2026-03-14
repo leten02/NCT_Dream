@@ -194,6 +194,7 @@ export default function App() {
   const streamRef = useRef<MediaStream | null>(null);
   const requestRef = useRef<number>();
   const lastClapTimeRef = useRef<number>(0);
+  const bgMusicRef = useRef<HTMLAudioElement | null>(null);
 
   const handleNextStage = () => {
     if (storyPhase > 0) return;
@@ -275,6 +276,28 @@ export default function App() {
       if (audioContextRef.current) audioContextRef.current.close();
     };
   }, []);
+
+  // 배경음악: 캐릭터가 모두 등장하면(stage === 3) 재생
+  useEffect(() => {
+    if (stage === 3) {
+      if (!bgMusicRef.current) {
+        bgMusicRef.current = new Audio(`${B}Imagination_Spark.mp3`);
+        bgMusicRef.current.loop = true;
+        bgMusicRef.current.volume = 0.5;
+      }
+      bgMusicRef.current.play().catch(() => {});
+    } else {
+      if (bgMusicRef.current) {
+        bgMusicRef.current.pause();
+        bgMusicRef.current.currentTime = 0;
+      }
+    }
+    return () => {
+      if (bgMusicRef.current) {
+        bgMusicRef.current.pause();
+      }
+    };
+  }, [stage]);
 
   // Scroll interaction for story progression
   useEffect(() => {
