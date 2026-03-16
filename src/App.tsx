@@ -15,7 +15,7 @@ const CHARACTERS = [
     text: "어떤 상황에서도 가능성을 믿는 에너지 ✨", // 말풍선에 들어갈 텍스트
     baseScale: 0.8, // 기본 크기 비율 (1.0이 원본 크기)
     activeScale: 0.94, // 마우스를 올렸을 때 커지는 크기 비율
-    stageReq: 1, // 이 캐릭터가 화면에 등장하기 위해 필요한 최소 stage 값 (클릭/박수 횟수)
+    stageReq: 2, // 이 캐릭터가 화면에 등장하기 위해 필요한 최소 stage 값 (클릭/박수 횟수)
     animation: { rotate: [0, -5, 5, -3, 3, 0] }, // 활성화 시 적용될 애니메이션 (여기서는 좌우로 흔들림)
     emojis: ['☀️', '😊', '✨', '💛'], // 캐릭터 클릭 시 튀어오르는 파티클 이모지들
     color: 'from-pink-300 to-rose-300', // 말풍선 텍스트와 바닥 조명에 사용될 그라데이션 색상
@@ -30,7 +30,7 @@ const CHARACTERS = [
     text: "포기하지 않고 끝까지 밀어붙이는 추진력 🔥",
     baseScale: 0.80,
     activeScale: 0.93,
-    stageReq: 2,
+    stageReq: 1,
     animation: { y: [0, -15, 0, -10, 0] },
     emojis: ['🔥', '💪', '🏃‍♀️', '✨'],
     color: 'from-blue-300 to-cyan-300',
@@ -180,7 +180,7 @@ const CharacterCard = ({ char, isActive, onActivate, onDeactivate }: any) => {
 };
 
 export default function App() {
-  // stage: 화면을 클릭하거나 박수를 칠 때마다 올라가는 단계 (0: 빈 무대, 1: 유청 등장, 2: 소윤 등장, 3: 태현 등장)
+  // stage: 화면을 클릭하거나 박수를 칠 때마다 올라가는 단계 (0: 빈 무대, 1: 소윤 등장, 2: 유청 등장, 3: 태현 등장)
   const [stage, setStage] = useState(0);
   // activeChar: 현재 마우스가 올라가 있는 캐릭터의 ID (없으면 null)
   const [activeChar, setActiveChar] = useState<number | null>(null);
